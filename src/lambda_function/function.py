@@ -38,11 +38,11 @@ def execute_query(query, single_result, params):
 def handler(event, context):
     logger.debug('Processing event {}'.format(json.dumps(event)))
     if event['operation'] == 'Invoke':
-        result = execute_query(event['query'], event['single_result'], event.get('params'))
+        result = execute_query(event['query'], event.get('single_result'), event.get('params'))
     elif event['operation'] == 'BatchInvoke':
         result = []
         for sub_event in event:
-            result.append(execute_query(sub_event['query'], sub_event['single_result'], sub_event.get('params')))
+            result.append(execute_query(sub_event['query'], sub_event.get('single_result'), sub_event.get('params')))
     else:
         raise Exception('operation {} not supported'.format(event['operation']))
     return result

@@ -17,7 +17,7 @@ lambda_name = 'appsync-athena-resolver'
 # https://packaging.python.org/en/latest/single_source_version.html
 lambda_version = '0.0.1'
 
-lambda_description = 'Lambda that reads from a DynamoDB Stream and forwards items to a Kinesis Firehose'
+lambda_description = 'Lambda resolves to an Athena database for AppSync GraphQL'
 
 # How mature is this project? Common values are
 #   3 - Alpha
