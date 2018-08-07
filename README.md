@@ -1,9 +1,11 @@
 # appsync-athena-resolver
 
 # Environment Variables:
-- **AWS_ATHENA_REGION_NAME** REQUIRED - The AWS region for Athena that this function should use.
+- **AWS_ATHENA_REGION_NAME** OPTIONAL - The AWS region for Athena that this function should use. If missing, will use the region that the fnuction is executing in.
 - **AWS_ATHENA_S3_STAGING_DIR** REQUIRED - This is the S3 location that Athena will store the query results in. It must be in the format `s3://YOUR_S3_BUCKET/path/to/`.
 - **AWS_ATHENA_SCHEMA_NAME** OPTIONAL - The schema/database name that you wish to query. If not provided, will default to the _default_ schema/database.
+- **MAX_CONCURRENT_QUERIES** OPTIONAL - The maximum number of concurrent queries to run in Athena. Defaults to `5`.
+- **POLL_INTERVAL** OPTIONAL - The rate at which to poll Athena for a response, in seconds. Defaults to `1.0`.
 
 # Handler Method
 function.handler
