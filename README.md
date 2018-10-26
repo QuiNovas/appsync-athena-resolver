@@ -7,6 +7,31 @@
 - **MAX_CONCURRENT_QUERIES** OPTIONAL - The maximum number of concurrent queries to run in Athena. Defaults to `5`.
 - **POLL_INTERVAL** OPTIONAL - The rate at which to poll Athena for a response, in seconds. Defaults to `1.0`.
 
+# AWS Permissions Required:
+You will need Athena and Glue (if you create your schema with Glue) permissions:
+```
+"athena:StopQueryExecution",
+"athena:StartQueryExecution",
+"athena:RunQuery",
+"athena:ListQueryExecutions",
+"athena:GetTables",
+"athena:GetTable",
+"athena:GetQueryResultsStream",
+"athena:GetQueryResults",
+"athena:GetQueryExecutions",
+"athena:GetQueryExecution",
+"athena:GetNamespaces",
+"athena:GetNamespace",
+"athena:GetExecutionEngines",
+"athena:GetExecutionEngine",
+"athena:GetCatalogs",
+"athena:CancelQueryExecution",
+"athena:BatchGetQueryExecution",
+"glue:GetTable",
+"glue:GetPartitions"
+```
+You will also require read access to the underlying Athena datasource, read and write access to the Athena result S3 bucket, and access to any KMS keys used in either of those.
+ 
 # Handler Method
 function.handler
 
@@ -16,9 +41,9 @@ This function supports both the `Invoke` and `BatchInvoke` options for Lambda re
 When resolver mapping, the following payload is required:
 ```
 {
-    "query": "string"
-    "single_result": "boolean"
-    "params": "map | list(map)"
+    "query": "string",
+    "params": map | list(map),
+    "single_result": boolean (OPTIONAL - defaults to false)
 }
 ```
 - _(dict)_
