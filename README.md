@@ -59,6 +59,6 @@ Results from this function will be a `map` or a `list` of `maps`, with the keys 
 _**NOTE**_ - it is up to you to construct your queries to match both the parameters you pass in and the number of results and result types you want out.
 
 # Lambda package location
-https://s3.amazonaws.com/lambdalambdalambda-repo/quinovas/appsync-athena-resolver/appsync-athena-resolver-0.0.1.zip
+https://s3.amazonaws.com/lambdalambdalambda-repo/quinovas/appsync-athena-resolver/appsync-athena-resolver-0.1.0.zip
 
 
