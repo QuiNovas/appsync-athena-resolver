@@ -12,12 +12,7 @@ MAX_CONCURRENT_QUERIES = int(os.environ.get('MAX_CONCURRENT_QUERIES', 5))
 
 
 def handler(event, context):
-    logger.debug(
-        'Processing event {} for Athena schema {}'.format(
-            json.dumps(event),
-            os.environ.get('AWS_ATHENA_SCHEMA_NAME', 'default')
-        )
-    )
+    logger.debug('Processing event {}'.format(json.dumps(event)))
     with _connect(event.get('schemaName')) as connection:
         if type(event) is dict:
             logger.info('Processing Invoke operation')
