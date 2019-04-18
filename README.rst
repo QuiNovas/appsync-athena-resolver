@@ -78,7 +78,7 @@ Request Syntax
 
 **query**: REQUIRED
   This is the query string to be executed. It may be parameterized with
-  `PyFormat`_, using the new format `{}` named placeholders method.
+  `PyFormat`_, using the new format `{}` `named placeholders`_ method.
 **params**: OPTIONAL
   Required if your `query` is parameterized. The keys in this map should
   correspond to the format names in your operation string or array.
