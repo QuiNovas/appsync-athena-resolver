@@ -4,12 +4,6 @@ from os import path
 from setuptools import setup, find_packages
 
 
-here = path.abspath(path.dirname(__file__))
-
-# Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as readme:
-    long_description = readme.read()
-
 lambda_name = 'appsync-athena-resolver'
 
 # Versions should comply with PEP440.  For a discussion on single-sourcing
@@ -18,6 +12,8 @@ lambda_name = 'appsync-athena-resolver'
 lambda_version = '0.2.0'
 
 lambda_description = 'Lambda resolves to an Athena database for AppSync GraphQL'
+
+long_description = lambda_description
 
 # How mature is this project? Common values are
 #   3 - Alpha
