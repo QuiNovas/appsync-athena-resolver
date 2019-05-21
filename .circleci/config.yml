@@ -5,14 +5,13 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - run: pip install --user lambda-pyathena
+      - run: python --version
       - run: python setup.py ldist
   build-lupload:
     docker:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - run: pip install --user lambda-pyathena
       - run: python setup.py lupload --access-key=${ACCESS_KEY_ID} --secret-access-key=${SECRET_ACCESS_KEY} --s3-bucket=${S3_BUCKET} --s3-prefix=quinovas/appsync-athena-resolver/
 
 workflows:
