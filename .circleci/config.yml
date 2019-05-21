@@ -5,7 +5,7 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - run: sudo pip install lambda-setuptools
+      - run: sudo pip install lambda-pyathena
       - run: python setup.py ldist
       - run: ls -al dist/
   build-lupload:
