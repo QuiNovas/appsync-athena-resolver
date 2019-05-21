@@ -5,7 +5,7 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - run: pip install lambda-pyathena
+      - run: pip install --user lambda-pyathena
       - run: python setup.py ldist
   build-lupload:
     docker:
