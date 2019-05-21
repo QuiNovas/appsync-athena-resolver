@@ -37,7 +37,7 @@ lambda_author_email='jwortmann@quinovas.com'
 # your project is installed. For an analysis of "install_requires" vs pip's
 # requirements files see:
 # https://packaging.python.org/en/latest/requirements.html
-lambda_install_requires = ['lambda-pyathena']
+lambda_install_requires = ['lambda-pyathena>=1.6.1']
 
 ##############################################
 # CHANGES BELOW HERE ARE MADE AT YOUR OWN RISK
@@ -71,7 +71,7 @@ setup(
 
     keywords=lambda_keywords,
 
-    install_requires=filter(lambda x : x not in ['boto3', 'botocore'], lambda_install_requires),
+    install_requires=[x for x in lambda_install_requires if x not in ['boto3', 'botocore']],
 
     package_dir={'': 'src'},
     packages=find_packages('src'),
