@@ -71,7 +71,7 @@ setup(
 
     keywords=lambda_keywords,
 
-    install_requires=filter(lambda x : x not in ['boto3', 'botocore'], lambda_install_requires),
+    install_requires=['lambda-pyathena'],
 
     package_dir={'': 'src'},
     packages=find_packages('src'),
