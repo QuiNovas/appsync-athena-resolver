@@ -38,13 +38,15 @@ def handler(event, context):
 
 
 def _get_connection(schema_name):
+    if not schema_name:
+        schema_name = os.environ.get('AWS_ATHENA_SCHEMA_NAME', 'default')
     if schema_name not in CONNECTION_CACHE:
         CONNECTION_CACHE[schema_name] = connect(
             cursor_class=AsyncCursor,
             poll_interval=float(os.environ.get('POLL_INTERVAL', 1.0)),
             region_name=os.environ.get('AWS_ATHENA_REGION_NAME', boto3.session.Session().region_name),
             s3_staging_dir=os.environ['AWS_ATHENA_S3_STAGING_DIR'],
-            schema_name=schema_name if schema_name else os.environ.get('AWS_ATHENA_SCHEMA_NAME', 'default')
+            schema_name=schema_name
         )
     return CONNECTION_CACHE[schema_name]    
 
