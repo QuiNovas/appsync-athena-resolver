@@ -15,7 +15,7 @@ __WORKGROUP = environ.get('WORKGROUP', 'primary')
 
 
 def handler(event, context):
-    getLogger().debug('Processing event {}'.format(jsondumps(event)))
+    getLogger().info('Processing event {}'.format(jsondumps(event)))
     result = {}
     if type(event) is dict:
         getLogger().info('Processing Invoke operation')
