@@ -18,8 +18,8 @@ Environment Variables
   May be overridden in the ``query`` request. Defaults to ``default``
 :WORKGROUP: The `AWS Athena`_ Workgroup to use during queries.
   May be overridden in the ``query`` request. Defaults to ``primary``.
-:LIMIT: The maximum number of results to return during the ``results`` request.
-  May be overridden in the ``results`` request. Defaults to ``100``.
+:MAX_CONCURRENT_QUERIES: The maximum number of concurrent queries allowed in
+  BatchInvoke requests. Defaults to ``5``.
 
 AWS Permissions Required
 ------------------------
