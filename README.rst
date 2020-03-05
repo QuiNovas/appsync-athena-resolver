@@ -7,6 +7,9 @@ appsync-athena-resolver
 .. _PyFormat: https://pyformat.info/
 .. _AWS AppSync: https://docs.aws.amazon.com/appsync/latest/devguide/welcome.html
 
+**VERSION 0.4.0 IS A BREAKING CHANGE FROM PREVIOUS VERSIONS.
+PLEASE PAY PARTICULAR ATTENTION TO THE INFORMATION BELOW.**
+
 This is a generic Lambda task function that can execute athena queries.
 It is intended to be used in `AWS AppSync`_.
 This function will take the input information, call `AWS Athena`_, and respond
@@ -14,49 +17,20 @@ to `AWS AppSync`_ with the results of the SQL call.
 
 Environment Variables
 ---------------------
-**AWS_ATHENA_REGION_NAME**: OPTIONAL
-  The AWS region for Athena that this function should use.
-  If missing, will use the region that the fnuction is executing in.
-**AWS_ATHENA_S3_STAGING_DIR**: REQUIRED
-  This is the S3 location that Athena will store the query results in.
-  It must be in the format `s3://YOUR_S3_BUCKET/path/to/`.
-**AWS_ATHENA_SCHEMA_NAME**: OPTIONAL
-  The schema/database name that you wish to query by default. The
-  **schemaName** input parameter will override this environment
-  variable if present. If neither is provided, will default to the
-  `default` schema/database.
-**MAX_CONCURRENT_QUERIES**: OPTIONAL
-  The maximum number of concurrent queries to run in Athena. Defaults
-  to `5`.
-**POLL_INTERVAL**: OPTIONAL
-  The rate at which to poll Athena for a response, in seconds. Defaults
-  to `1.0`.
+:DATABASE: The `AWS Athena`_ Database to query.
+  May be overridden in the ``query`` request. Defaults to ``default``
+:WORKGROUP: The `AWS Athena`_ Workgroup to use during queries.
+  May be overridden in the ``query`` request. Defaults to ``primary``.
+:MAX_CONCURRENT_QUERIES: The maximum number of concurrent queries allowed in
+  BatchInvoke requests. Defaults to ``5``.
 
 AWS Permissions Required
 ------------------------
-- athena:StopQueryExecution
-- athena:StartQueryExecution
-- athena:RunQuery
-- athena:ListQueryExecutions
-- athena:GetTables
-- athena:GetTable
-- athena:GetQueryResultsStream
-- athena:GetQueryResults
-- athena:GetQueryExecutions
-- athena:GetQueryExecution
-- athena:GetNamespaces
-- athena:GetNamespace
-- athena:GetExecutionEngines
-- athena:GetExecutionEngine
-- athena:GetCatalogs
-- athena:CancelQueryExecution
-- athena:BatchGetQueryExecution
-- glue:GetTable
-- glue:GetPartitions
+* **AmazonAthenaFullAccess** arn:aws:iam::aws:policy/AmazonAthenaFullAccess
 
-You will also require read access to the underlying `AWS Athena`_ datasource,
-read and write access to the Athena result S3 bucket, and access to any KMS
-keys used in either of those.
+You will also require read access to the underlying `AWS Athena`_ datasource
+and access to any KMS keys used.
+
 
 Handler Method
 --------------
@@ -66,14 +40,14 @@ Handler Method
 
 Request Syntax
 --------------
-.. code::
+Request::
 
   {
-      "query": "string",
-      "params": map | list(map),
-      "schemaName": "string",
-      "singleResult": boolean,
-      "single_result": boolean
+      "query": "select * from bar",
+      "params": {},
+      "database": "foo",
+      "workgroup": "myworkgroup",
+      "singleResult": boolean
   }
 
 **query**: REQUIRED
@@ -82,17 +56,40 @@ Request Syntax
 **params**: OPTIONAL
   Required if your `query` is parameterized. The keys in this map should
   correspond to the format names in your operation string or array.
-**schemaName**: OPTIONAL
+**database**: OPTIONAL
   The schema/database name that you wish to query. Overrides
-  **AWS_ATHENA_SCHEMA_NAME** if present.
+  **DATABASE** if present.
+**workgroup**: OPTIONAL
+  The `AWS Athena`_ Workgroup to use during. Overrides
+  **WORKGROUP** if present.
 **singleResult**: OPTIONAL
   `true` if AppSync is expecting a single map result, `false` if multiple
   results (`maps`) in a `list` may be returned. Defaults to `false`.
-**single_result**: OPTIONAL, DEPRECATED
-  Use **singleResult** instead.
+
+Response:
+
+  If `singleResult` is `true`::
+
+    {
+      "Key": Value,
+      (Keys and values are generated from the query results.
+      Keys are the column names, values are converted to their
+      specified types.)
+    }
+
+  If `singleResult` is `false`::
+
+    [
+      {
+        "Key": Value,
+        (Keys and values are generated from the query results.
+        Keys are the column names, values are converted to their
+        specified types.)
+      }
+    ]
 
 Lambda Package Location
 -----------------------
-https://s3.amazonaws.com/lambdalambdalambda-repo/quinovas/athena-task/appsync-athena-resolver-0.2.0.zip
+https://s3.amazonaws.com/lambdalambdalambda-repo/quinovas/athena-task/appsync-athena-resolver-0.4.0.zip
 
 License: `APL2`_

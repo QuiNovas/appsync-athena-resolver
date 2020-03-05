@@ -9,7 +9,7 @@ lambda_name = 'appsync-athena-resolver'
 # Versions should comply with PEP440.  For a discussion on single-sourcing
 # the version across setup.py and the project code, see
 # https://packaging.python.org/en/latest/single_source_version.html
-lambda_version = '0.3.2'
+lambda_version = '0.4.0'
 
 lambda_description = 'Lambda resolves to an Athena database for AppSync GraphQL'
 
@@ -37,7 +37,7 @@ lambda_author_email='jwortmann@quinovas.com'
 # your project is installed. For an analysis of "install_requires" vs pip's
 # requirements files see:
 # https://packaging.python.org/en/latest/requirements.html
-lambda_install_requires = ['lambda-pyathena>=1.6.1']
+lambda_install_requires = ['athena-type-converter', 'backoff']
 
 ##############################################
 # CHANGES BELOW HERE ARE MADE AT YOUR OWN RISK
