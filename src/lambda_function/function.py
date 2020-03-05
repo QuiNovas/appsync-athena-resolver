@@ -11,7 +11,6 @@ from os import environ
 
 
 getLogger().setLevel(INFO)
-MAX_CONCURRENT_QUERIES = int(environ.get('MAX_CONCURRENT_QUERIES', 5))
 __ATHENA = client('athena')
 __ATHENA_TYPE_CONVERTERS = {
     'boolean': lambda x: bool(strtobool(x)) if x else None,
@@ -35,6 +34,9 @@ __ATHENA_TYPE_CONVERTERS = {
     'decimal': lambda x: Decimal(x) if x else None,
     'json': lambda x: jsonloads(x) if x else None,
 }
+__DATABASE = environ.get('DATABASE', 'default')
+__MAX_CONCURRENT_QUERIES = int(environ.get('MAX_CONCURRENT_QUERIES', 5))
+__WORKGROUP = environ.get('WORKGROUP', 'primary')
 
 
 def handler(event, context):
@@ -45,14 +47,14 @@ def handler(event, context):
         execution_request = {
             'QueryString': event['query'].format(**event.get('params', {})),
             'QueryExecutionContext': {
-                'Database': event.get('database', environ.get('DATABASE', 'default'))
+                'Database': event.get('database', __DATABASE)
             },
-            'WorkGroup': event.get('workgroup', environ.get('WORKGROUP', 'primary'))
+            'WorkGroup': event.get('workgroup', __WORKGROUP)
         }
         result = __execute_query(execution_request, event.get('singleResult', False))
     else:
         getLogger().debug('Processing BatchInvoke operation with a batch of {}'.format(len(event)))
-        with ThreadPoolExecutor(max_workers=MAX_CONCURRENT_QUERIES) as executor:
+        with ThreadPoolExecutor(max_workers=__MAX_CONCURRENT_QUERIES) as executor:
             future_query_results = []     
             for batch_event in event:
                 future_query_results.append(
@@ -61,9 +63,9 @@ def handler(event, context):
                         {
                             'QueryString': batch_event['query'].format(**batch_event.get('params', {})),
                             'QueryExecutionContext': {
-                                'Database': batch_event.get('database', environ.get('DATABASE', 'default'))
+                                'Database': batch_event.get('database', __DATABASE)
                             },
-                            'WorkGroup': batch_event.get('workgroup', environ.get('WORKGROUP', 'primary'))
+                            'WorkGroup': batch_event.get('workgroup', __WORKGROUP)
                         },
                         batch_event.get('singleResult', False)
                     )
