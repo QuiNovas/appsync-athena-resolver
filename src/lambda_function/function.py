@@ -1,5 +1,6 @@
-from athena_type_converter import convert_result_set
+from athena_type_converter import convert_result_set, TYPE_CONVERTERS
 from backoff import on_predicate, fibo
+from base64 import b64encode
 from boto3 import client
 from concurrent.futures import ThreadPoolExecutor, wait
 from json import dumps as jsondumps
@@ -12,6 +13,15 @@ __ATHENA = client('athena')
 __DATABASE = environ.get('DATABASE', 'default')
 __MAX_CONCURRENT_QUERIES = int(environ.get('MAX_CONCURRENT_QUERIES', 5))
 __WORKGROUP = environ.get('WORKGROUP', 'primary')
+__timestamp = TYPE_CONVERTERS['timestamp']
+TYPE_CONVERTERS['timestamp'] = lambda x: __timestamp(x).isoformat()
+__date = TYPE_CONVERTERS['date']
+TYPE_CONVERTERS['date'] = lambda x: __date(x).isoformat()
+__time = TYPE_CONVERTERS['time']
+TYPE_CONVERTERS['time'] = lambda x: __time(x).isoformat()
+__varbinary = TYPE_CONVERTERS['varbinary']
+TYPE_CONVERTERS['varbinary'] = lambda x: b64encode(__varbinary(x))
+TYPE_CONVERTERS['decimal'] = lambda x: float(x) if x else None
 
 
 def handler(event, context):
