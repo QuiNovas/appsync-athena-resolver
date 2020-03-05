@@ -37,7 +37,7 @@ lambda_author_email='jwortmann@quinovas.com'
 # your project is installed. For an analysis of "install_requires" vs pip's
 # requirements files see:
 # https://packaging.python.org/en/latest/requirements.html
-lambda_install_requires = ['backoff']
+lambda_install_requires = ['athena-type-converter', 'backoff']
 
 ##############################################
 # CHANGES BELOW HERE ARE MADE AT YOUR OWN RISK

@@ -1,39 +1,14 @@
+from athena_type_converter import convert_result_set
 from backoff import on_predicate, fibo
-from binascii import a2b_hex
 from boto3 import client
 from concurrent.futures import ThreadPoolExecutor, wait
-from datetime import datetime
-from decimal import Decimal
-from distutils.util import strtobool
-from json import dumps as jsondumps, loads as jsonloads
+from json import dumps as jsondumps
 from logging import getLogger, INFO
 from os import environ
 
 
 getLogger().setLevel(INFO)
 __ATHENA = client('athena')
-__ATHENA_TYPE_CONVERTERS = {
-    'boolean': lambda x: bool(strtobool(x)) if x else None,
-    'tinyint': lambda x: int(x) if x else None,
-    'smallint': lambda x: int(x) if x else None,
-    'integer': lambda x: int(x) if x else None,
-    'bigint': lambda x: int(x) if x else None,
-    'float': lambda x: float(x) if x else None,
-    'real': lambda x: float(x) if x else None,
-    'double': lambda x: float(x) if x else None,
-    'char': lambda x: x,
-    'varchar': lambda x: x,
-    'string': lambda x: x,
-    'timestamp': lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').isoformat() if x else None,
-    'date': lambda x: datetime.strptime(x, '%Y-%m-%d').date().isoformat() if x else None,
-    'time': lambda x: datetime.strptime(x, '%H:%M:%S.%f').time().isoformat() if x else None,
-    'varbinary': lambda x: a2b_hex(''.join(x.split(' '))) if x else None,
-    'array': lambda x: x,
-    'map': lambda x: x,
-    'row': lambda x: x,
-    'decimal': lambda x: Decimal(x) if x else None,
-    'json': lambda x: jsonloads(x) if x else None,
-}
 __DATABASE = environ.get('DATABASE', 'default')
 __MAX_CONCURRENT_QUERIES = int(environ.get('MAX_CONCURRENT_QUERIES', 5))
 __WORKGROUP = environ.get('WORKGROUP', 'primary')
@@ -77,20 +52,6 @@ def handler(event, context):
     return result
 
 
-def __map_meta_data(meta_data):
-    mapped_meta_data = []
-    for column in meta_data:
-        mapped_meta_data.append((column['Name'], __ATHENA_TYPE_CONVERTERS[column['Type']]))
-    return mapped_meta_data
-
-
-def __map_result(meta_data, data):
-    result = {}
-    for n in range(len(data)):
-        result[meta_data[n][0]] = meta_data[n][1](data[n].get('VarCharValue', None))
-    return result
-
-
 @on_predicate(fibo, lambda x: x not in ('SUCCEEDED', 'FAILED', 'CANCELLED'), max_time=30)
 def __poll_query_status(query_execution_id):
     response = __ATHENA.get_query_execution(
@@ -107,11 +68,7 @@ def __get_results(query_execution_id, next_token=None):
     if next_token:
         params['NextToken'] = next_token
     response = __ATHENA.get_query_results(**params)
-    meta_data = __map_meta_data(response['ResultSet']['ResultSetMetadata']['ColumnInfo'])
-    results = []
-    rows = response['ResultSet']['Rows']
-    for n in range(1, len(rows)):
-        results.append(__map_result(meta_data, rows[n]['Data']))
+    results = convert_result_set(response['ResultSet'])
     return results if 'NextToken' not in response else results + __get_results(query_execution_id, response['NextToken'])
 
 

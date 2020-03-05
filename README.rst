@@ -7,6 +7,9 @@ appsync-athena-resolver
 .. _PyFormat: https://pyformat.info/
 .. _AWS AppSync: https://docs.aws.amazon.com/appsync/latest/devguide/welcome.html
 
+**VERSION 0.4.0 IS A BREAKING CHANGE FROM PREVIOUS VERSIONS.
+PLEASE PAY PARTICULAR ATTENTION TO THE INFORMATION BELOW.**
+
 This is a generic Lambda task function that can execute athena queries.
 It is intended to be used in `AWS AppSync`_.
 This function will take the input information, call `AWS Athena`_, and respond
