@@ -1,0 +1,70 @@
+name: Artifacts Upload
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+jobs:
+  start-runner:
+    name: Start self-hosted EC2 runner
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_RUNNER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_RUNNER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_RUNNER_REGION }}
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.AWS_RUNNERS_ACCESS_TOKEN }}
+          ec2-image-id: ${{ secrets.AWS_RUNNER_PYTHON_EC2_IMAGE_ID }}
+          ec2-instance-type: ${{ secrets.AWS_RUNNER_EC2_INSTANCE_TYPE }}
+          subnet-id: ${{ secrets.AWS_RUNNER_SUBNET_ID }}
+          security-group-id: ${{ secrets.AWS_RUNNER_SECURITY_GROUP_ID }}
+          iam-role-name: ${{ secrets.AWS_RUNNER_IAM_ROLE_NAME }}
+          aws-resource-tags: >
+            [
+              {"Key": "Name", "Value": "github-python-runner"},
+              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
+            ]
+  build:
+    needs: start-runner
+    runs-on: ${{ needs.start-runner.outputs.label }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Deps
+        run: pip3.9 install lambda-setuptools twine
+      - name: Upload
+        run: |
+          python3.9 setup.py ldist
+          python3.9 setup.py lupload --access-key=${{ secrets.LAMBDALAMBDALAMBDA_ACCESS_KEY_ID }} --secret-access-key=${{ secrets.LAMBDALAMBDALAMBDA_SECRET_ACCESS_KEY }} --s3-bucket=${{ secrets.LAMBDALAMBDALAMBDA_BUCKET }} --s3-prefix=quinovas/appsync-athena-resolver/
+        if: ${{ success() }}
+  stop-runner:
+    name: Stop self-hosted EC2 runner
+    needs:
+      - start-runner
+      - build
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_RUNNER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_RUNNER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_RUNNER_REGION }}
+      - name: Stop EC2 runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ secrets.AWS_RUNNERS_ACCESS_TOKEN }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
